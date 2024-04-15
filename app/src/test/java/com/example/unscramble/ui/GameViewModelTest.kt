@@ -1,5 +1,7 @@
 package com.example.unscramble.ui
 
+import com.example.unscramble.data.MAX_NO_OF_WORDS
+import com.example.unscramble.data.SCORE_INCREASE
 import com.example.unscramble.data.getUnscrambledWord
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -49,5 +51,23 @@ class GameViewModelTest {
         assertEquals(0, gameUiState.score)
         assertFalse(gameUiState.isGuessedWordWrong)
         assertFalse(gameUiState.isGameOver)
+    }
+
+    @Test
+    fun allWordsGuessed_uiUpdated(){
+        var expectedScore = 0
+        var currentState = viewModel.uiState.value
+        var guessedWord = getUnscrambledWord(currentState.currentScrambledWord)
+        repeat(MAX_NO_OF_WORDS){
+            expectedScore += SCORE_INCREASE
+            viewModel.updateUserGuess(guessedWord)
+            viewModel.checkUserGuess()
+            currentState = viewModel.uiState.value
+            guessedWord = getUnscrambledWord(currentState.currentScrambledWord)
+            // Assert that after evey successful guess, the score is updated accordingly
+            assertEquals(expectedScore, currentState.score)
+        }
+        assertEquals(MAX_NO_OF_WORDS, currentState.currentWordCount)
+        assertTrue(currentState.isGameOver)
     }
 }
